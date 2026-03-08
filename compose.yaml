@@ -1,0 +1,81 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./Init/Postgres/Init.sql:/docker-entrypoint-initdb.d/Init.sql:ro
+    restart: unless-stopped
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.0
+    container_name: keycloak
+    command: start
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_DB_SCHEMA: keycloak
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"      # needed so proxy can reach keycloak over HTTP internally
+      KC_HOSTNAME_STRICT: "true"
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+      KC_PROXY: edge
+      KC_HTTP_PORT: ${KEYCLOAK_HTTP_PORT}
+      KC_HTTPS_PORT: ${KEYCLOAK_HTTPS_PORT}
+      KC_HEALTH_ENABLED: "true"
+    restart: unless-stopped
+    networks:
+      - backend
+      - frontend
+    healthcheck:
+      test: ["CMD-SHELL", "{ printf 'HEAD /health/ready HTTP/1.0\\r\\n\\r\\n' >&0; grep 'HTTP/1.0 200'; } 0<>/dev/tcp/localhost/9000"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  security-api:
+    container_name: security-api
+    image: ${REGISTRY}/security-api:${TAG}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: ${SECURITY_API_HTTP_PORT}
+      ASPNETCORE_HTTPS_PORTS: ${SECURITY_API_HTTPS_PORT}
+      ConnectionStrings__Default: ${SECURITY_API_CONNECTION_STRING}
+      Keycloak__Authority: ${KEYCLOAK_AUTHORITY}
+    restart: unless-stopped
+    networks:
+      - backend
+      - frontend
+
+volumes:
+  postgres_data:
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge

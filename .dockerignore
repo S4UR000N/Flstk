@@ -1,0 +1,139 @@
+# =================================================
+# Dependency directories
+# =================================================
+node_modules/
+**/node_modules/
+
+# .NET dependencies & build outputs
+bin/
+obj/
+**/bin/
+**/obj/
+
+# =================================================
+# Production and build outputs
+# =================================================
+dist/
+out/
+build/
+public/build/
+
+# Nuxt outputs
+.nuxt/
+.output/
+
+# =================================================
+# Vite, VuePress, Nuxt, and cache directories
+# =================================================
+.vite/
+.vitepress/
+.cache/
+.tmp/
+.nitro/
+.turbo/
+
+# =================================================
+# Test output and coverage
+# =================================================
+coverage/
+reports/
+jest/
+cypress/
+cypress/screenshots/
+cypress/videos/
+
+# =================================================
+# Environment files & secrets
+# =================================================
+*.env*
+**/.env
+!.env.production     # Keep production env if needed
+
+secrets.dev.yaml
+values.dev.yaml
+**/secrets.dev.yaml
+**/values.dev.yaml
+
+# =================================================
+# Logs & debug files
+# =================================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =================================================
+# TypeScript & build artifacts
+# =================================================
+*.tsbuildinfo
+
+# =================================================
+# IDE & editor settings
+# =================================================
+.vscode/
+.idea/
+.vs/
+**/.vs/
+**/.vscode/
+
+*.swp
+*.user
+**/*.*proj.user
+
+# Java / misc IDE leftovers
+**/.classpath
+**/.project
+**/.settings
+**/.toolstarget
+
+# =================================================
+# System files
+# =================================================
+.DS_Store
+Thumbs.db
+
+# =================================================
+# Docker-related files
+# =================================================
+Dockerfile
+Dockerfile*
+.dockerignore
+docker-compose.yml
+docker-compose.override.yml
+docker-compose*
+**/Dockerfile*
+**/docker-compose*
+
+# =================================================
+# Git files (exclude repo but allow minimal metadata if needed)
+# =================================================
+.git/
+**/.git
+.gitignore
+**/.gitignore
+
+# Optional: allow git metadata for versioning
+!**/.gitignore
+!.git/HEAD
+!.git/config
+!.git/packed-refs
+!.git/refs/heads/**
+
+# =================================================
+# Misc project files not needed in images
+# =================================================
+LICENSE
+README.md
+charts/
+**/charts/
+
+# Azure Dev Spaces / misc infra
+azds.yaml
+**/azds.yaml
+
+# =================================================
+# Database & tooling artifacts
+# =================================================
+**/*.dbmdl
+**/*.jfm

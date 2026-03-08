@@ -1,0 +1,42 @@
+services:
+  postgres:
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: roottoor
+
+  keycloak:
+    command: start-dev                # overrides base 'start' — no TLS required in dev
+    ports:
+      - "${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"
+    environment:
+      KC_DB_USERNAME: root
+      KC_DB_PASSWORD: roottoor
+      KC_DB_URL: jdbc:postgresql://postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME: ""               # clears base hostname — start-dev doesn't need it
+      KC_PROXY: ""                  # clears base 'edge' — not needed in dev
+    healthcheck:
+      test: ["CMD-SHELL", "{ printf 'HEAD /health/ready HTTP/1.0\\r\\n\\r\\n' >&0; grep 'HTTP/1.0 200'; } 0<>/dev/tcp/localhost/9000"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  security-api:
+    build:
+      context: ./Src/Microservices/Security/API
+      dockerfile: Dockerfile
+    ports:
+      - "${SECURITY_API_HTTP_PORT}:${SECURITY_API_HTTP_PORT}"
+      - "${SECURITY_API_HTTPS_PORT}:${SECURITY_API_HTTPS_PORT}"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      ConnectionStrings__Default: Host=postgres;Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Keycloak__Authority: http://keycloak:${KEYCLOAK_HTTP_PORT}/realms/${KEYCLOAK_REALM}  # container name, not localhost
