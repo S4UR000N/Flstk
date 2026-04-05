@@ -1,15 +1,18 @@
+using Cross.API.Application.DependencyInjection;
+using Cross.API.Security.DependencyInjection;
+
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+
+builder.AddControllers();
+builder.AddOpenApi();
+builder.AddAuth();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.UseOpenApiDev();
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
+app.UseAuth();
 app.MapControllers();
+
 app.Run();

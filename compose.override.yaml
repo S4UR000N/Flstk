@@ -5,8 +5,7 @@ services:
 
   keycloak:
     command: start-dev --import-realm                                                               # overrides base 'start' — no TLS required in dev
-    ports:
-      - "${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"
+    ports: ["${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"]
     environment:
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME: ""                                                                               # clears base hostname — start-dev doesn't need it

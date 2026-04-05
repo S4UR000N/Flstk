@@ -73,6 +73,7 @@ services:
     networks:
       - backend
       - frontend
+    ports: ["${SECURITY_API_HTTPS_PORT}:${SECURITY_API_HTTPS_PORT}"]
 
 volumes:
   postgres_data:

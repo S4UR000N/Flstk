@@ -5,5 +5,6 @@
   <Project Path="compose.dcproj" Id="81dded9d-158b-e303-5f62-77a2896d2a5a">
     <Build />
   </Project>
+  <Project Path="Src/Microservices/Cross/API/Cross.API.csproj" Id="30043194-ba04-4568-a3c8-0e2a2f7445f3" />
   <Project Path="Src/Microservices/Security/API/Security.API.csproj" />
 </Solution>
