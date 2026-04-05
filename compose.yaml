@@ -22,7 +22,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.5.0
     container_name: keycloak
-    command: start
+    command: start --import-realm
     depends_on:
       postgres:
         condition: service_healthy
@@ -32,9 +32,9 @@ services:
       KC_DB_USERNAME: ${POSTGRES_USER}
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KC_DB_SCHEMA: keycloak
-      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-      KC_HTTP_ENABLED: "true"      # needed so proxy can reach keycloak over HTTP internally
+      #KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME}                                  # provided by Init/Keycloak/InitMasterRealm.json
+      #KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}                                  # provided by Init/Keycloak/InitMasterRealm.json
+      KC_HTTP_ENABLED: "true"                                                                       # needed so proxy can reach keycloak over HTTP internally
       KC_HOSTNAME_STRICT: "true"
       KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
       KC_PROXY: edge
@@ -51,6 +51,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 120s
+    volumes: [./Init/Keycloak:/opt/keycloak/data/import:ro]
 
   security-api:
     container_name: security-api
@@ -66,6 +67,8 @@ services:
       ASPNETCORE_HTTPS_PORTS: ${SECURITY_API_HTTPS_PORT}
       ConnectionStrings__Default: ${SECURITY_API_CONNECTION_STRING}
       Keycloak__Authority: ${KEYCLOAK_AUTHORITY}
+      Keycloak__ClientId: ${KEYCLOAK_CLIENT_ID}
+      Keycloak__ClientSecret: ${KEYCLOAK_CLIENT_SECRET}
     restart: unless-stopped
     networks:
       - backend
