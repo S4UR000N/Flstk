@@ -3,6 +3,11 @@ services:
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
 
+  rabbitmq:
+    ports:
+      - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"                                                        # AMQP protocol port
+      - "15672:15672"   
+
   keycloak:
     command: start-dev --import-realm                                                               # overrides base 'start' — no TLS required in dev
     ports: ["${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"]
